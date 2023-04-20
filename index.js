@@ -27,6 +27,11 @@ async function run(){
         const database =client.db('doctors_portal');
         const appointmentsCollection = database.collection('appointments');
 
+        app.get('/appointments', async(req,res) =>{
+          const cursor = appointmentsCollection.findOne({});
+          const appointments = await cursor.toArray()
+        })
+
         app.post('/appointments', async(req, res) => {
           // v 72.5 
           const appointment = req.body;
