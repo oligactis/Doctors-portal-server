@@ -27,10 +27,17 @@ async function run(){
         const database =client.db('doctors_portal');
         const appointmentsCollection = database.collection('appointments');
 
+        // v 72.7 
         app.get('/appointments', async(req,res) =>{
-          const cursor = appointmentsCollection.findOne({});
-          const appointments = await cursor.toArray()
+          const email = req.query.email;
+          const date = new Date(req.query.date).toLocatDateString(); // v 72.9
+          const query = {email: email, date: date} // v 72.9
+          // console.log(query)
+          const cursor = appointmentsCollection.find({query});
+          const appointments = await cursor.toArray();
+          res.json(appointments);
         })
+        // v 72.7 
 
         app.post('/appointments', async(req, res) => {
           // v 72.5 
