@@ -91,7 +91,7 @@ async function run() {
     app.post('/users', async (req, res) => {
       const user = req.body;
       console.log('post', user);
-      const result = await usersCollection.insertOne(JSON.parse(user))
+      const result = await usersCollection.insertOne(user)
       console.log(result);
       res.json(result);
     })
@@ -101,7 +101,7 @@ async function run() {
       // console.log('put', user);
       const filter = { email: user.email };
       const options = { upsert: true };
-      const updateDoc = { $set: JSON.parse(user) };
+      const updateDoc = { $set: user };
       const result = await usersCollection.updateOne(filter, updateDoc, options);
       res.json(result);
     })
