@@ -33,8 +33,10 @@ const client = new MongoClient(uri, {
 });
 //73.8
 async function verifytoken(req, res, next) {
-  if (req.headers?.authorization?.startWith('Bearer ')) {
+  if (req.headers?.authorization?.startsWith('Bearer ')) {
     const token = req.headers.authorization.split(' ')[1];
+    const email = await admin.auth().verifyIdToken(token);
+    req.decodedEmail = email?.email;
   }
   next();
 }
@@ -68,7 +70,7 @@ async function run() {
       // v 72.5 
       const appointment = req.body;
       const result = await appointmentsCollection.insertOne(appointment);
-      console.log(result);
+      // console.log(result);
       res.json(result)
       // v 72.5 
     })
@@ -90,13 +92,20 @@ async function run() {
     // v 73.2 
     app.post('/users', async (req, res) => {
       const user = req.body;
-      console.log('post', user);
+      // console.log('post', user);
       const result = await usersCollection.insertOne(user)
-      console.log(result);
       res.json(result);
     })
 
-    app.post('/users', async (req, res) => {
+    app.get("/getusers", async (req, res) => {
+      const cursor = usersCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+
+
+    })
+
+    app.put('/users', async (req, res) => {
       const user = req.body;
       // console.log('put', user);
       const filter = { email: user.email };
@@ -113,7 +122,7 @@ async function run() {
       const requester = req.decodedEmail;
       if (requester) {
         const requesterAccount = await usersCollection.findOne({ email: requester });
-        if (requesterAccount.role === 'admin') {
+        if (requesterAccount?.role === 'admin') {
           const filter = { email: user.email };
           const updateDoc = { $set: { role: `admin` } };
           const result = await usersCollection.updateOne(filter, updateDoc)
