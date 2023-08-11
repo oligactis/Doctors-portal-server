@@ -88,11 +88,8 @@ async function run() {
     })
 
 
-
-    // v 73.2 
     app.post('/users', async (req, res) => {
       const user = req.body;
-      // console.log('post', user);
       const result = await usersCollection.insertOne(user)
       res.json(result);
     })
@@ -114,9 +111,8 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc, options);
       res.json(result);
     })
-    // v 73.5
 
-    //73.9 5 k updade kora hoiche
+
     app.put('/users/admin', verifytoken, async (req, res) => {
       const user = req.body;
       const requester = req.decodedEmail;
