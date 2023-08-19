@@ -65,15 +65,11 @@ async function run() {
       const appointments = await cursor.toArray();
       res.json(appointments);
     })
-    // v 72.7 
 
     app.post('/appointments', async (req, res) => {
-      // v 72.5 
       const appointment = req.body;
       const result = await appointmentsCollection.insertOne(appointment);
-      // console.log(result);
       res.json(result)
-      // v 72.5 
     })
 
     // get method 
@@ -88,7 +84,6 @@ async function run() {
       res.json({ admin: isAdmin });
     })
 
-
     app.post('/users', async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user)
@@ -99,13 +94,10 @@ async function run() {
       const cursor = usersCollection.find({});
       const result = await cursor.toArray();
       res.json(result);
-
-
     })
 
     app.put('/users', async (req, res) => {
       const user = req.body;
-      // console.log('put', user);
       const filter = { email: user.email };
       const options = { upsert: true };
       const updateDoc = { $set: user };
