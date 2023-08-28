@@ -3,26 +3,20 @@ const app = express()
 const cors = require('cors')
 const admin = require("firebase-admin");
 require('dotenv').config()
-//mongodb
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const port = process.env.PORT || 5000;
-//73.8
-// doctors-portal-firebase-adminsdk.json
-const serviceAccount = require('./doctors-portal-firebase-adminsdk.json');
-
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+console.log(serviceAccount)
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-//73.8
 
 //middleware
 app.use(cors());
-app.use(express.json()); //v 72.3
-
+app.use(express.json());
 
 // from mongodb
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.far0qag.mongodb.net/?retryWrites=true&w=majority`
 const client = new MongoClient(uri, {
   serverApi: {
@@ -31,7 +25,7 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-//73.8
+
 async function verifytoken(req, res, next) {
   if (req.headers?.authorization?.startsWith('Bearer ')) {
     const token = req.headers.authorization.split(' ')[1];
@@ -41,26 +35,18 @@ async function verifytoken(req, res, next) {
   next();
 }
 
-//73.8
-
-
-
-
 async function run() {
   try {
     const tes = await client.connect()
-    // console.log('database connected')
-    // v 72.3 
     const database = client.db('doctors_portal');
     const appointmentsCollection = database.collection('appointments');
     const usersCollection = database.collection('users');
 
-    // v 72.7 
     app.get('/appointments', async (req, res) => {
       const email = req.query.email;
-      const date = req.query.date; // v 72.9
+      const date = req.query.date;
       console.log(email, date)
-      const query = { email, date } // v 72.9
+      const query = { email, date }
       const cursor = appointmentsCollection.find(query)
       const appointments = await cursor.toArray();
       res.json(appointments);
@@ -72,7 +58,6 @@ async function run() {
       res.json(result)
     })
 
-    // get method 
     app.get('/users/:email', verifytoken, async (req, res) => {
       const email = req.params.email;
       const quary = { email: email };
@@ -104,7 +89,6 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc, options);
       res.json(result);
     })
-
 
     app.put('/users/admin', verifytoken, async (req, res) => {
       const user = req.body;
@@ -140,7 +124,6 @@ app.listen(port, () => {
 
 /*
 naming convantion 
-
 app.get('/users')all user k neoya
 app.post('/users') specific 1 ta user k neoya
 app.get('/users/:id') specific 1 ta user neoya filter kore email or id

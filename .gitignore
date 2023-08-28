@@ -1,3 +1,4 @@
 node_modules
 .env
-# doctors-portal-firebase-adminsdk.json
+doctors-portal-firebase-adminsdk.json
+.vercel
